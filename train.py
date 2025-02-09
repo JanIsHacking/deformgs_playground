@@ -86,7 +86,7 @@ def flow_loss(all_projections=None,visibility_filter_list=None,viewpoint_cams=No
 
 def scene_reconstruction(dataset, opt, hyper, pipe, testing_iterations, saving_iterations, 
                          checkpoint_iterations, checkpoint, debug_from,
-                         gaussians, scene, stage, tb_writer, train_iter,timer,user_args=None):
+                         gaussians: GaussianModel, scene: Scene, stage, tb_writer, train_iter,timer,user_args=None):
     first_iter = 0
 
     gaussians.training_setup(opt)

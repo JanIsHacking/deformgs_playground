@@ -6,7 +6,7 @@
 	url = https://github.com/graphdeco-inria/diff-gaussian-rasterization
 [submodule "submodules/depth-diff-gaussian-rasterization"]
 	path = submodules/depth-diff-gaussian-rasterization
-	url = https://github.com/ingra14m/depth-diff-gaussian-rasterization
+	url = https://github.com/ingra14m/depth-diff-gaussian-rasterization/tree/f2d8fa9921ea9a6cb9ac1c33a34ebd1b11510657
 [submodule "SIBR_viewers"]
 	path = SIBR_viewers
 	url = https://gitlab.inria.fr/sibr/sibr_core

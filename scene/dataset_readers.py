@@ -12,7 +12,7 @@
 import os
 import sys
 from PIL import Image
-from typing import NamedTuple
+from typing import Callable, NamedTuple
 from scene.colmap_loader import read_extrinsics_text, read_intrinsics_text, qvec2rotmat, \
     read_extrinsics_binary, read_intrinsics_binary, read_points3D_binary, read_points3D_text
 from scene.hyper_loader import Load_hyper_data, format_hyper_data
@@ -497,7 +497,7 @@ def read_timeline(path):
 
     return timestamp_mapper, max_time_float
 
-def readPanoptoSceneInfo(path, white_background, eval, extension=".png", time_skip=None,view_skip=None,scale=None):
+def readPanoptoSceneInfo(path, white_background, eval, extension=".png", time_skip=None,view_skip=None,scale=None) -> SceneInfo:
     timestamp_mapper, max_time = read_timeline(path)
     print("Reading Training Transforms")
     train_cam_infos = readCamerasFromTransforms(path, "transforms_train.json", white_background, extension, timestamp_mapper, time_skip=time_skip,view_skip=view_skip,split='train',panopto=True,scale=scale)
@@ -550,7 +550,7 @@ def readPanoptoSceneInfo(path, white_background, eval, extension=".png", time_sk
                            )
     return scene_info
 
-def readNerfSyntheticInfo(path, white_background, eval, extension=".png", time_skip=None,view_skip=None):
+def readNerfSyntheticInfo(path, white_background, eval, extension=".png", time_skip=None,view_skip=None) -> SceneInfo:
     # time_skip = 4
     timestamp_mapper, max_time = read_timeline(path)
     print("Reading Training Transforms")
@@ -578,21 +578,23 @@ def readNerfSyntheticInfo(path, white_background, eval, extension=".png", time_s
 
     nerf_normalization = getNerfppNorm(train_cam_infos)
 
-    ply_path = os.path.join(path, "points3d.ply")
-    # Since this data set has no colmap data, we start with random points
+    ply_path = os.path.join(path, "initial_pcd.ply")
+    print(ply_path)
     num_pts = 2000
-    print(f"Generating random point cloud ({num_pts})...")
-    
-    # We create random points inside the bounds of the synthetic Blender scenes
-    scene_size = 2.0
-    xyz = np.random.random((num_pts, 3)) * scene_size - scene_size / 2
-    shs = np.random.random((num_pts, 3)) / 255.0
-    pcd = BasicPointCloud(points=xyz, colors=SH2RGB(shs), normals=np.zeros((num_pts, 3)))
-    storePly(ply_path, xyz, SH2RGB(shs) * 255)
-    try:
+    if os.path.exists(ply_path):
         pcd = fetchPly(ply_path)
-    except:
-        pcd = None
+        indices = np.random.choice(len(pcd.points), num_pts, replace=False)
+        points = pcd.points[indices]
+        colors = pcd.colors[indices]
+        normals = pcd.normals[indices]
+        pcd = BasicPointCloud(points, colors, normals)
+    else:
+        print(f"Generating random point cloud ({num_pts})...")
+        scene_size = 2.0
+        xyz = np.random.random((num_pts, 3)) * scene_size - scene_size / 2
+        shs = np.random.random((num_pts, 3)) / 255.0
+        pcd = BasicPointCloud(points=xyz, colors=SH2RGB(shs), normals=np.zeros((num_pts, 3)))
+        storePly(ply_path, xyz, SH2RGB(shs) * 255)
 
     scene_info = SceneInfo(point_cloud=pcd,
                            train_cameras=train_cam_infos,
@@ -604,6 +606,7 @@ def readNerfSyntheticInfo(path, white_background, eval, extension=".png", time_s
                            all_times=all_times
                            )
     return scene_info
+
 def format_infos(dataset,split):
     # loading
     cameras = []
