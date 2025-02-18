@@ -277,7 +277,8 @@ def render(viewpoint_camera, pc : GaussianModel, pipe, bg_color : torch.Tensor, 
         rotations = rotations_final[mask],
         cov3D_precomp = cov3D_precomp)
     
-
+    loss = torch.sum(rendered_image)
+    loss.backward()
     rendered_mask, _, _ = rasterizer(
         means3D = means3D_final[mask],
         means2D = means2D[mask],

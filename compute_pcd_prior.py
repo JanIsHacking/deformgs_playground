@@ -70,7 +70,7 @@ def main():
 
     visualize_point_cloud(colmap_point_cloud)
 
-    # storePly('data/synthetic/scene_1/initial_pcd.ply', colmap_point_cloud.points, colmap_point_cloud.colors, colmap_point_cloud.normals)
+    storePly('data/synthetic/scene_1/initial_pcd.ply', colmap_point_cloud.points, colmap_point_cloud.colors, colmap_point_cloud.normals)
 
 
 if __name__ == '__main__':

@@ -582,6 +582,7 @@ def readNerfSyntheticInfo(path, white_background, eval, extension=".png", time_s
     print(ply_path)
     num_pts = 2000
     if os.path.exists(ply_path):
+        print(f"Found existing point cloud initialization with {num_pts} points.")
         pcd = fetchPly(ply_path)
         indices = np.random.choice(len(pcd.points), num_pts, replace=False)
         points = pcd.points[indices]
@@ -589,7 +590,7 @@ def readNerfSyntheticInfo(path, white_background, eval, extension=".png", time_s
         normals = pcd.normals[indices]
         pcd = BasicPointCloud(points, colors, normals)
     else:
-        print(f"Generating random point cloud ({num_pts})...")
+        print(f"Generating random point cloud with {num_pts} points.")
         scene_size = 2.0
         xyz = np.random.random((num_pts, 3)) * scene_size - scene_size / 2
         shs = np.random.random((num_pts, 3)) / 255.0
